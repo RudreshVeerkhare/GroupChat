@@ -1,5 +1,5 @@
 # ChatGroup
-This is my another vacation project which is group chatting website.This website is based on Django pyhton web framework and application of Websockets.Websockets are implemented with Django using django-channels and channel-redis.This website is deployed on Heroku with AWS S3 (Amazon Web Services) for storing user files.  
+This is my another vacation project which is group chatting website.This website is based on Django python web framework and application of Websockets.Websockets are implemented with Django using django-channels and channel-redis.This website is deployed on Heroku with AWS S3 (Amazon Web Services) for storing user files.  
   
 
 You can explore more on : <https://rudresh-chatgroup.herokuapp.com/>  
