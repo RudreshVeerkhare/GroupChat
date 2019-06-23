@@ -1,0 +1,20 @@
+body.bgc{
+    background-color: #32465a;
+  }
+  
+  li:hover{
+    background-color: #32465a36;
+  }
+  
+  #form-div{
+    width:500px;
+    height:auto;
+    padding:20px 20px;
+    background-color : #e9ecef;
+    border:2px solid #17a2b8;
+    border-radius:10px;
+  }
+  
+  .asteriskField{
+    display:none;
+  }

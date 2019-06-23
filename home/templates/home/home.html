@@ -1,0 +1,95 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GroupChat</title>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+    <script src="https://use.typekit.net/hoy3lrg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="{% static 'home/css/style_home.css' %}" />
+  </head>
+
+<body>
+  <div id="frame">
+    <div id="sidepanel">
+      <div id="profile">
+        <div class="wrap">
+          <img id="profile-img" src="{{ user.profile.image.url }}" class="online" alt="" />
+          <a href="{% url 'home:profile' user %}"><p>{{ user.username }}</p></a>
+          <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+          <div id="expanded">
+            <div class="row">
+              <a class="btn btn-outline-light col-lg-3" style="font-weight:bold;margin-left:20px;"  href="{% url 'home:search_user' %}">Search Users</a>
+              <a class="btn btn-outline-light col-lg-3" style="margin:0 10%; font-weight:bold;" href="{% url 'home:profile' user %}">Profile</a>
+              <a class="btn btn-outline-danger col-lg-3" style="font-weight:bold;" href="{% url 'logout' %}">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="contacts">
+        <ul id="groups">
+          {% comment %} <li class="contact">
+            <div class="wrap">
+              <span class="contact-status online"></span>
+              <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+              <div class="meta">
+                <p class="name">Louis Litt</p>
+                <p class="preview">You just got LITT up, Mike.</p>
+              </div>
+            </div>
+          </li>
+          <li class="contact active">
+            <div class="wrap">
+              <span class="contact-status busy"></span>
+              <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+              <div class="meta">
+                <p class="name">Harvey Specter</p>
+                <p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+              </div>
+            </div>
+          </li> {% endcomment %}
+          {% for group in groups %}
+            <li class="contact">
+                <div class="wrap">
+                <img src="{{ group.group_profile.image.url }}" alt="" />
+                <div class="meta">
+                    <a href="{% url 'home:group' group %}"><p class="name">{{ group.group_name }}</p></a>
+                    <p class="preview">{{ group.messages.last.parent_user }} : {{ group.messages.last.message_text }}</p>
+                </div>
+                </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+      <div id="bottom-bar">
+        
+        <div class="collapse-content">
+          <form method="POST">
+            
+            {% csrf_token %}
+            <fieldset class='form-group'>
+              <legend id='form-legend' class="border-bottom mb-4">Create Group</legend>
+              {% crispy g_form %}
+            </fieldset>
+            
+          </form>
+        </div>
+        <button id="addcontact" class="collapse-button"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Create Group</span></button>
+      </div>
+    </div>
+    
+
+<script type="text/javascript" src="{% static 'home/javascript/main_home.js' %}"></script>
+</body>
+
+</html>

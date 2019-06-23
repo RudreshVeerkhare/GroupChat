@@ -1,0 +1,98 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>GroupChat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="{% static 'home/css/style_profile.css' %}">
+</head>
+<body class="bgc">
+  
+
+ <nav class="navbar navbar-expand-sm navbar-light" style="background-color:#e9ecef;">
+  <!-- Brand/logo -->
+  <a class="navbar-brand" href="#">Profile Info</a>
+  
+  <!-- Links -->
+  <ul class="navbar-nav">
+    <li class="nav-item rounded">
+      <a class="nav-link" href="{% url 'home:home' %}">Home</a>
+    </li>
+    {% if required_user == user %}
+        <li class="nav-item rounded">
+            <a data-toggle="collapse" id="update-prof" class="nav-link" href="#update-form">Update Profile</a>
+        </li>
+    {% endif %}
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item rounded">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+      </li>
+    </ul>
+  
+</nav>
+  
+<div class="jumbotron text-center">
+  <h1 class="profile-heading">{{ required_user.username }}</h1>
+  
+    <img id="img-div" src="{{ required_user.profile.image.url }}" class="rounded-circle">
+    <p class="text-secondary">{{ required_user.email }}</p>
+    {% if required_user.profile.user_info %}
+        <p>{{ required_user.profile.user_info }}</p>
+    {% endif %}
+</div>
+
+{% if required_user.all_groups %}
+    <h2 class="text-center" style="color:black;">Active In Groups</h2>
+{% endif %}
+
+<div class="container">
+    {% for group in required_user.all_groups.all %}
+        <div class="media group-box">    
+            <img class="rounded-circle account-img" src="{{ group.group_profile.image.url }}">
+            <div class="media-body">
+            <h2 class="account-heading"><a href="{% url 'home:group_profile' group %}">{{ group.group_name }}</a></h2>
+            {% if group.group_info %}
+                <p class="text-secondary preview">{{ group.group_info }}</p>
+            {% endif %}
+            </div>
+            <br>
+        </div>
+    {% endfor %}
+</div>
+<div class="container text-white-50">
+  
+  
+    {% if required_user == user %}
+        <div id="update-form" class="collapse">
+            
+            <form method="POST" enctype="multipart/form-data">
+                <fieldset class="form-group">
+                    {% csrf_token %}
+                    <legend class="border-bottom mb-4 bcg">Profile Info</legend>
+                    {{ u_form|crispy }}
+                    {{ p_form|crispy }}
+                </fieldset>
+                <div class="form-group" id="submit-btn-div">
+                    <button class="btn btn-outline-info" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+<script>
+
+$("#update-prof").on('click',function() {
+   $('html,body').animate({scrollTop: document.body.scrollHeight},"slow");
+});
+
+</script>
+</html>

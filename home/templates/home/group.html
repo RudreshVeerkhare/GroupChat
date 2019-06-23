@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GroupChat</title>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+    <script src="https://use.typekit.net/hoy3lrg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="{% static 'home/css/style.css' %}" />
+  </head>
+
+<body>
+  <div id="frame">
+    <div id="sidepanel">
+      <div id="profile">
+        <div class="wrap">
+          <img id="profile-img" src="{{ user.profile.image.url }}" class="online" alt="" />
+          <a href="{% url 'home:profile' user %}"><p>{{ user.username }}</p></a>
+          <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+          <div id="status-options">
+            <ul>
+              <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
+              <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
+              <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
+              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>
+            </ul>
+          </div>
+          <div id="expanded">
+            <div class="row">
+              <a class="btn btn-outline-light col-lg-5" style="margin-left:20px;font-weight:bold;padding-left:25px;"  href="{% url 'home:search_user' %}">Search Users</a>
+            </div>
+            <div class="row">
+              <a class="btn btn-outline-light col-lg-4" style="margin-left:20px; font-weight:bold;" href="{% url 'home:home'%}">Home</a>
+            </div>
+            <div class="row">
+              <a class="btn btn-outline-danger col-lg-4" style="font-weight:bold;margin-left:20px;" href="{% url 'logout' %}">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="contacts">
+        <ul id="groups">
+          {% comment %} <li class="contact">
+            <div class="wrap">
+              <span class="contact-status online"></span>
+              <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+              <div class="meta">
+                <p class="name">Louis Litt</p>
+                <p class="preview">You just got LITT up, Mike.</p>
+              </div>
+            </div>
+          </li>
+          <li class="contact active">
+            <div class="wrap">
+              <span class="contact-status busy"></span>
+              <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+              <div class="meta">
+                <p class="name">Harvey Specter</p>
+                <p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+              </div>
+            </div>
+          </li> {% endcomment %}
+        </ul>
+      </div>
+      <div id="bottom-bar">
+        <a href='{% url 'home:add_members' group %}' style="text-decoration:none;"><button id="addcontact" class="collapse-button"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add Members</span></button></a>
+        {% comment %} <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button> {% endcomment %}
+      </div>
+    </div>
+    
+
+    
+    <div class="content">
+      <div class="contact-profile">
+        <img src="{{ group.group_profile.image.url }}" alt="" />
+        <a href="{% url 'home:group_profile' group %}"><p>{{ group.group_name }}</p></a>
+        <div id = "older_msg_div">
+          <button id="check_older_messages">see older messages</button>
+        </div>
+        
+      </div>
+      <div class="messages">
+        <ul id="chat-log">
+          {% comment %} <li class="sent">
+            <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
+            <p>How the hell am I supposed to get a jury to believe you when I am not even sure that I do?!</p>
+          </li>
+          <li class="replies">
+            <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+            <p>When you're backed against the wall, break the god damn thing down.</p>
+          </li> {% endcomment %}
+        </ul>
+      </div>
+      <div class="message-input">
+        <div class="wrap">
+        <input id="chat-message-input" type="text" placeholder="Write your message..." />
+        <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
+        <button id="chat-message-submit" class="submit">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" src="{% static 'home/javascript/main.js' %}"></script>
+<script type="text/javascript" src="{% static 'home/javascript/reconnecting-websocket.js' %}"></script>
+<script>
+    var roomName = {{ room_name_json }};
+    var username = "{{ user.username }}";
+    var old_msg_page_count = 0;
+    var loc = window.location, new_uri;
+    if (loc.protocol === "https:") {
+        new_uri = "wss://";
+    } else {
+        new_uri = "ws://";
+    }
+
+    var chatSocket = new ReconnectingWebSocket(
+        new_uri + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+    chatSocket.onopen = function(e) {
+      fetchGroups();
+      fetchMessages(true);
+    }
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if (data['command'] === 'messages') {
+
+          var ChatLog = document.querySelector('#chat-log');
+          var elements = ChatLog.getElementsByTagName('li');
+          while(elements[0]){
+            elements[0].parentNode.removeChild(elements[0]);
+          }
+
+          for (let i=0; i<data['messages'].length; i++) {
+            createMessage(data['messages'][i]);
+          }
+          if(old_msg_page_count == 0){
+            scroll();
+          }
+
+        } else if (data['command'] === 'new_message'){
+          if(old_msg_page_count != 0){
+            old_msg_page_count = 0;
+            fetchMessages(true);
+          }
+          createMessage(data['message']);
+          scroll();
+        }
+        else if (data['command'] === 'groups'){
+           for (let i=0; i<data['groups'].length; i++) {
+            createGroup(data['groups'][i]);
+          }
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#check_older_messages').onclick = function(e) {
+      old_msg_page_count++;
+       fetchMessages(false);
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        var messageInputDom = document.getElementById('chat-message-input');
+        var message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'command': 'new_message',
+            'message': message,
+            'from': username,
+            'grp_name' : roomName
+        }));
+
+        messageInputDom.value = '';
+        scroll();
+    };
+
+    function fetchMessages(recent) {
+      if(recent){
+        chatSocket.send(JSON.stringify({'command': 'fetch_messages','grp_name' : roomName }));  
+      }
+      chatSocket.send(JSON.stringify({'command': 'fetch_old_messages','grp_name' : roomName }));
+    }
+
+    function fetchGroups() {
+      chatSocket.send(JSON.stringify({'command': 'fetch_groups','username' : username }));
+    }
+
+
+    function convertToMonth(index){
+      switch(index){
+        case 1:
+          return 'Jan'
+        case 2:
+          return 'Feb'
+        case 3:
+          return 'Mar'
+        case 4:
+          return 'Apr'
+        case 5:
+          return 'May'
+        case 6:
+          return 'Jun'
+        case 7:
+          return 'Jul'
+        case 8:
+          return 'Aug'
+        case 9:
+          return 'Sep'
+        case 10:
+          return 'Oct'
+        case 11:
+          return 'Nov'
+        case 12:
+          return 'Dec'
+      }
+    }
+
+    function formatDate(date) {
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? '0'+minutes : minutes;
+      var strTime = hours + ':' + minutes + ' ' + ampm;
+      //return strTime;
+      return date.getDate() + " " + convertToMonth(date.getMonth()+1) + "  " + strTime;
+    }
+
+    function createGroup(data) {
+      var groupName = data['group_name'];
+      var aTag = document.createElement('a');
+      var msgListTag = document.createElement('li');
+      var wrapDivTag = document.createElement('div');
+      var imgTag = document.createElement('img');
+      var metaDivTag = document.createElement('div');
+      var namePTag = document.createElement('p');
+      var previewPTag = document.createElement('p');
+      
+      namePTag.textContent = data.group_name;
+      previewPTag.textContent = data.last_msg;
+
+      imgTag.src = data.profile_pic;
+      aTag.href = '/home/' + groupName;
+      aTag.style = "text-decoration:None;";
+      if (roomName === groupName) {
+        msgListTag.className = 'contact active';
+      } else {
+        msgListTag.className = 'contact';
+      }
+
+      
+      wrapDivTag.className = 'wrap';
+      metaDivTag.className = 'meta';
+      namePTag.className = 'name';
+      previewPTag.className = 'preview';
+
+      aTag.appendChild(namePTag)
+      msgListTag.appendChild(wrapDivTag);
+      wrapDivTag.appendChild(imgTag);
+      wrapDivTag.appendChild(metaDivTag);
+      metaDivTag.appendChild(aTag);
+      metaDivTag.appendChild(previewPTag);
+
+      document.querySelector('#groups').appendChild(msgListTag);
+    }
+
+    function createMessage(data) {
+      var author = data['author'];
+      var msgListTag = document.createElement('li');
+      var imgTag = document.createElement('img');
+      var pTag = document.createElement('p');
+      var smallTag = document.createElement('small');
+      var nameTag = document.createElement('small')
+      var breakTag = document.createElement('br');
+      var breakTag2 = document.createElement('br');
+      var msgTag = document.createElement('p');
+      var date_posted = new Date(data.timestamp);
+      nameTag.textContent = author;
+      msgTag.textContent = data.content;
+      msgTag.className = "no-mp";
+      
+      smallTag.textContent = formatDate(date_posted);
+      smallTag.className = 'time_posted';
+      
+      imgTag.src = data["author_profile_img"];
+      
+      if (author === username) {
+        msgListTag.className = 'sent';
+      } else {
+        msgListTag.className = 'replies';
+      }
+      msgListTag.appendChild(imgTag);
+      msgListTag.appendChild(pTag);
+      pTag.appendChild(nameTag);
+      pTag.appendChild(breakTag2);
+      pTag.appendChild(msgTag);
+      pTag.appendChild(breakTag);
+      pTag.appendChild(smallTag);
+      document.querySelector('#chat-log').appendChild(msgListTag);
+    }
+
+</script>
+</body>
+
+</html>

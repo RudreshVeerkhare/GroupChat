@@ -1,0 +1,64 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GroupChat</title>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+    <script src="https://use.typekit.net/hoy3lrg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="{% static 'home/css/style_add_members.css' %}" />
+  </head>
+
+<body>
+  <div id="frame">
+    <div id="sidepanel">
+      <div id="profile">
+        <div class="wrap">
+          <img id="profile-img" src="{{ group.group_profile.image.url }}"  alt="" />
+          <a href="{% url 'home:group_profile' group %}"><p>{{ group.group_name }}</p></a>
+        </div>
+      </div>
+      <div id="search">
+        <form method='POST'>
+            {% csrf_token %}
+            {{ form|crispy }}
+        </form>
+      </div>
+      <div id="contacts">
+        {% comment %} <ul id="groups">
+          {% for group in groups %}
+            <li class="contact">
+                <div class="wrap">
+                <img src="{{ group.group_profile.image.url }}" alt="" />
+                <div class="meta">
+                    <a href="{% url 'home:group' group %}"><p class="name">{{ group.group_name }}</p></a>
+                    <p class="preview">{{ group.messages.last.parent_user }} : {{ group.messages.last.message_text }}</p>
+                </div>
+                </div>
+            </li>
+          {% endfor %}
+        </ul> {% endcomment %}
+        
+        <div class="form-div">
+            {% if list %}
+                <form method='POST'>
+                    {% csrf_token %}
+                    {% crispy list %}
+                </form>
+            {% endif %}
+        </div>
+      </div>
+      
+    </div>
+</body>
+
+</html>

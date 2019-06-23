@@ -1,0 +1,49 @@
+#img-div{
+    height:300px;
+    width:300px;
+    margin-bottom:20px;
+  }
+  body.bgc{
+    background-color: #32465a;
+  }
+  
+  li:hover{
+    background-color: #32465a36;
+  }
+
+  .asteriskField{
+    display : none;
+  }
+
+  .preview{
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 5px 0 0 0;
+    padding: 0 0 1px;
+  }
+
+  .group-box{
+      margin : 10px;
+  }
+
+  .account-img {
+    height: 75px;
+    width: 75px;
+    margin-right: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .account-heading {
+    font-size: 1.5rem;
+    color: black;
+  }
+
+  .profile-heading {
+    font-size: 2.5rem;
+    color: black;
+  }
+
+  a{
+    text-decoration: none !important;
+    color:inherit;
+  }
